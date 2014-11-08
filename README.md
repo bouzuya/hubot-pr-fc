@@ -1,23 +1,21 @@
-# hubot-pr
+# hubot-pr-fc
 
-A Hubot script that list / merge the pull request.
+A Hubot script that list / merge the pull request. (for FaithCreates Inc.)
 
 This script inspired by [hubot-list-pr][gh:bouzuya/hubot-list-pr] and [hubot-merge-pr][gh:bouzuya/hubot-merge-pr].
 
+This is the forked repository. The original repository is [hubot-pr][gh:bouzuya/hubot-pr].
+
 ## Installation
 
-    $ npm install git://github.com/bouzuya/hubot-pr.git
+    $ npm install 'https://github.com/bouzuya/hubot-pr-fc/archive/{VERSION}.tar.gz'
 
-or
-
-    $ # TAG is the package version you need.
-    $ npm install 'git://github.com/bouzuya/hubot-pr.git#TAG'
-
-## Sample Interaction
+## Examples
 
     bouzuya> hubot help pr
       hubot> hubot pr [<user>/]<repo> - list pull requests
       hubot> hubot pr [<user>/]<repo> #<N> - merge a pull request
+      hubot> hubot pr [<user>/]<repo> <issueNo> - merge a pull request
 
     (list)
     bouzuya> hubot pr hitoridokusho/hibot
@@ -33,6 +31,15 @@ or
              OK ? [yes/no]
     bouzuya> yes
       hubot> merged: hitoridokusho/hibot#2 : Pull Request successfully merged
+
+    (merge)
+    bouzuya> hubot pr hitoridokusho/hibot 3
+      hubot> #3 ISSUE-3 issue title
+             hitoridokusho:master <- bouzuya:add-hubot-merge-pr
+             https://github.com/hitoridokusho/hibot/pull/3
+             OK ? [yes/no]
+    bouzuya> yes
+      hubot> merged: hitoridokusho/hibot#3 : Pull Request successfully merged
 
     (HUBOT_PR_DEFAULT_USERNAME=hitoridokusho)
     (list)
@@ -72,9 +79,10 @@ MIT
 [![Build Status][travis-badge]][travis]
 [![Dependencies status][david-dm-badge]][david-dm]
 
-[travis]: https://travis-ci.org/bouzuya/hubot-pr
-[travis-badge]: https://travis-ci.org/bouzuya/hubot-pr.svg?branch=master
-[david-dm]: https://david-dm.org/bouzuya/hubot-pr
-[david-dm-badge]: https://david-dm.org/bouzuya/hubot-pr.png
+[travis]: https://travis-ci.org/bouzuya/hubot-pr-fc
+[travis-badge]: https://travis-ci.org/bouzuya/hubot-pr-fc.svg?branch=master
+[david-dm]: https://david-dm.org/bouzuya/hubot-pr-fc
+[david-dm-badge]: https://david-dm.org/bouzuya/hubot-pr-fc.png
+[gh:bouzuya/hubot-pr]: https://github.com/bouzuya/hubot-pr
 [gh:bouzuya/hubot-list-pr]: https://github.com/bouzuya/hubot-list-pr
 [gh:bouzuya/hubot-merge-pr]: https://github.com/bouzuya/hubot-merge-pr
