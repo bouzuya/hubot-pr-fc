@@ -3,12 +3,16 @@
 #
 # Configuration:
 #   HUBOT_PR_DEFAULT_USERNAME
-#   HUBOT_PR_TOKEN
 #   HUBOT_PR_TIMEOUT
+#   HUBOT_PR_TOKEN
 #
 # Commands:
+#   hubot merge [<user>/]<repo> - list pull requests
+#   hubot merge [<user>/]<repo> #<N> - merge a pull request
+#   hubot merge [<user>/]<repo> <issueNo> - merge a pull request
 #   hubot pr [<user>/]<repo> - list pull requests
-#   hubot pr [<user>/]<repo> <N> - merge a pull request
+#   hubot pr [<user>/]<repo> #<N> - merge a pull request
+#   hubot pr [<user>/]<repo> <issueNo> - merge a pull request
 #
 # Author:
 #   bouzuya <m@bouzuya.net>
@@ -23,7 +27,7 @@ class HubotPullRequest
     client = @_client()
     client.list(user, repo)
       .then (pulls) ->
-        return if pulls.length is 0
+        return res.send('no pr') if pulls.length is 0
         message = pulls
           .map (p) -> """
               \##{p.number} #{p.title}
@@ -34,6 +38,17 @@ class HubotPullRequest
       .then null, (err) ->
         res.robot.logger.error err
         res.send 'hubot-pr: error'
+
+  confirmMergingIssueNo: (res, user, repo, issueNo) ->
+    client = @_client()
+    client.list(user, repo)
+      .then (pulls) =>
+        return res.send('no pr') if pulls.length is 0
+        matches = pulls.filter (p) ->
+          pattern = new RegExp('^[0-9A-Z_]+-' + issueNo)
+          p.title.match pattern
+        return res.send('no pr') if matches.length is 0
+        @confirmMerging(res, user, repo, matches[0].number)
 
   confirmMerging: (res, user, repo, number) ->
     client = @_client()
@@ -91,12 +106,19 @@ class HubotPullRequest
 module.exports = (robot) ->
   pr = new HubotPullRequest()
 
-  robot.respond /pr\s+(?:([^\/]+)\/)?(\S+)(?:\s+#(\d+))?\s*$/i, (res) ->
+  pattern = /(?:pr|merge)\s+(?:([^\/]+)\/)?(\S+)(?:\s+(#?\d+))?\s*$/i
+  robot.respond pattern, (res) ->
     user = res.match[1] ? process.env.HUBOT_PR_DEFAULT_USERNAME
     return unless user?
     repo = res.match[2]
     number = res.match[3]
-    f = if number? then pr.confirmMerging else pr.list
+    f = if number?.match(/^#/)
+      number = number.substring(1)
+      pr.confirmMerging
+    else if number?
+      pr.confirmMergingIssueNo
+    else
+      pr.list
     f.apply pr, [res, user, repo, number]
 
   robot.hear /y(?:es)?/i, (res) ->
