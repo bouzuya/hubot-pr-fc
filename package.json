@@ -1,5 +1,5 @@
 {
-  "name": "hubot-pr-f",
+  "name": "hubot-pr-fc",
   "version": "3.0.0",
   "description": "A Hubot script that list / merge the pull request",
   "main": "index.js",
