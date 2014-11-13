@@ -112,6 +112,9 @@ module.exports = (robot) ->
     return unless user?
     repo = res.match[2]
     number = res.match[3]
+    role = 'merge-' + repo
+    return res.send("you does not have #{role} role") \
+      unless robot.auth?.hasRole(res.envelope.user, role)
     f = if number?.match(/^#/)
       number = number.substring(1)
       pr.confirmMerging
