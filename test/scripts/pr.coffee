@@ -51,80 +51,144 @@ describe 'pr', ->
       done()
     @robot.shutdown()
 
-  describe 'patterns', ->
-    [
-      [
-        message: 'hubot pr hitoridokusho/hibot'
-        matches: [
-          'hubot pr hitoridokusho/hibot'
-          'hitoridokusho'
-          'hibot'
-          undefined
+  describe 'listeners[0].regex', ->
+    describe 'valid patterns', ->
+      beforeEach ->
+        @tests = [
+          message: 'hubot pr hitoridokusho/hibot'
+          matches: [
+            'hubot pr hitoridokusho/hibot'
+            'hitoridokusho'
+            'hibot'
+            undefined
+          ]
+        ,
+          message: 'hubot pr hitoridokusho/hibot #1'
+          matches: [
+            'hubot pr hitoridokusho/hibot #1'
+            'hitoridokusho'
+            'hibot'
+            '#1'
+          ]
+        ,
+          message: 'hubot pr hibot'
+          matches: [
+            'hubot pr hibot'
+            undefined
+            'hibot'
+            undefined
+          ]
+        ,
+          message: 'hubot pr hibot #1'
+          matches: [
+            'hubot pr hibot #1'
+            undefined
+            'hibot'
+            '#1'
+          ]
         ]
-      ,
-        message: 'hubot pr hitoridokusho/hibot #1'
-        matches: [
-          'hubot pr hitoridokusho/hibot #1'
-          'hitoridokusho'
-          'hibot'
-          '1'
-        ]
-      ,
-        message: 'hubot pr hibot'
-        matches: [
-          'hubot pr hibot'
-          undefined
-          'hibot'
-          undefined
-        ]
-      ,
-        message: 'hubot pr hibot #1'
-        matches: [
-          'hubot pr hibot #1'
-          undefined
-          'hibot'
-          '1'
-        ]
-      ]
-    ,
-      [
-        message: 'yes'
-        matches: ['yes']
-      ,
-        message: 'y'
-        matches: ['y']
-      ,
-        message: 'Y'
-        matches: ['Y']
-      ]
-    ,
-      [
-        message: 'no'
-        matches: ['no']
-      ,
-        message: 'n'
-        matches: ['n']
-      ,
-        message: 'N'
-        matches: ['N']
-      ]
-    ].forEach (tests, index) ->
-      describe "listeners[#{index}].regex", ->
-        tests.forEach ({ message, matches }) ->
-          beforeEach ->
-            @index = index
-            @message = message
-            @matches = matches
 
-          describe 'receive ' + message, ->
-            it 'should match', ->
-              callback = @sinon.spy()
-              @robot.listeners[@index].callback = callback
-              sender = new User 'bouzuya', room: 'hitoridokusho'
-              @robot.adapter.receive new TextMessage(sender, @message)
-              actualMatches = callback.firstCall.args[0].match.map((i) -> i)
-              assert callback.callCount is 1
-              assert.deepEqual actualMatches, @matches
+      it 'should match', ->
+        @tests.forEach ({ message, matches }) =>
+          callback = @sinon.spy()
+          @robot.listeners[0].callback = callback
+          sender = new User 'bouzuya', room: 'hitoridokusho'
+          @robot.adapter.receive new TextMessage(sender, message)
+          actualMatches = callback.firstCall.args[0].match.map((i) -> i)
+          assert callback.callCount is 1
+          assert.deepEqual actualMatches, matches
+
+  describe 'listeners[1].regex', ->
+    describe 'valid patterns', ->
+      beforeEach ->
+        @tests = [
+          message: 'yes'
+          matches: ['yes']
+        ,
+          message: 'y'
+          matches: ['y']
+        ,
+          message: 'Y'
+          matches: ['Y']
+        ]
+
+      it 'should match', ->
+        @tests.forEach ({ message, matches }) =>
+          callback = @sinon.spy()
+          @robot.listeners[1].callback = callback
+          sender = new User 'bouzuya', room: 'hitoridokusho'
+          @robot.adapter.receive new TextMessage(sender, message)
+          actualMatches = callback.firstCall.args[0].match.map((i) -> i)
+          assert callback.callCount is 1
+          assert.deepEqual actualMatches, matches
+
+    describe 'invalid patterns', ->
+      beforeEach ->
+        @messages = [
+          '_yes'
+          'yes_'
+          '_yes_'
+          '_y'
+          'y_'
+          '_y_'
+          '_Y'
+          'Y_'
+          '_Y_'
+        ]
+
+      it 'should not match', ->
+        @messages.forEach (message) =>
+          callback = @sinon.spy()
+          @robot.listeners[1].callback = callback
+          sender = new User 'bouzuya', room: 'hitoridokusho'
+          @robot.adapter.receive new TextMessage(sender, message)
+          assert callback.callCount is 0
+
+  describe 'listeners[2].regex', ->
+    describe 'valid patterns', ->
+      beforeEach ->
+        @tests = [
+          message: 'no'
+          matches: ['no']
+        ,
+          message: 'n'
+          matches: ['n']
+        ,
+          message: 'N'
+          matches: ['N']
+        ]
+
+      it 'should match', ->
+        @tests.forEach ({ message, matches }) =>
+          callback = @sinon.spy()
+          @robot.listeners[2].callback = callback
+          sender = new User 'bouzuya', room: 'hitoridokusho'
+          @robot.adapter.receive new TextMessage(sender, message)
+          actualMatches = callback.firstCall.args[0].match.map((i) -> i)
+          assert callback.callCount is 1
+          assert.deepEqual actualMatches, matches
+
+    describe 'invalid patterns', ->
+      beforeEach ->
+        @messages = [
+          '_no'
+          'no_'
+          '_no_'
+          '_n'
+          'n_'
+          '_n_'
+          '_N'
+          'N_'
+          '_N_'
+        ]
+
+      it 'should not match', ->
+        @messages.forEach (message) =>
+          callback = @sinon.spy()
+          @robot.listeners[1].callback = callback
+          sender = new User 'bouzuya', room: 'hitoridokusho'
+          @robot.adapter.receive new TextMessage(sender, message)
+          assert callback.callCount is 0
 
   describe 'listeners[0].callback (pr)', ->
     beforeEach ->
