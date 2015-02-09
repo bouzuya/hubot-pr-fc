@@ -122,6 +122,28 @@ describe 'pr', ->
           assert callback.callCount is 1
           assert.deepEqual actualMatches, matches
 
+    describe 'invalid patterns', ->
+      beforeEach ->
+        @messages = [
+          '_yes'
+          'yes_'
+          '_yes_'
+          '_y'
+          'y_'
+          '_y_'
+          '_Y'
+          'Y_'
+          '_Y_'
+        ]
+
+      it 'should not match', ->
+        @messages.forEach (message) =>
+          callback = @sinon.spy()
+          @robot.listeners[1].callback = callback
+          sender = new User 'bouzuya', room: 'hitoridokusho'
+          @robot.adapter.receive new TextMessage(sender, message)
+          assert callback.callCount is 0
+
   describe 'listeners[2].regex', ->
     describe 'valid patterns', ->
       beforeEach ->
@@ -145,6 +167,28 @@ describe 'pr', ->
           actualMatches = callback.firstCall.args[0].match.map((i) -> i)
           assert callback.callCount is 1
           assert.deepEqual actualMatches, matches
+
+    describe 'invalid patterns', ->
+      beforeEach ->
+        @messages = [
+          '_no'
+          'no_'
+          '_no_'
+          '_n'
+          'n_'
+          '_n_'
+          '_N'
+          'N_'
+          '_N_'
+        ]
+
+      it 'should not match', ->
+        @messages.forEach (message) =>
+          callback = @sinon.spy()
+          @robot.listeners[1].callback = callback
+          sender = new User 'bouzuya', room: 'hitoridokusho'
+          @robot.adapter.receive new TextMessage(sender, message)
+          assert callback.callCount is 0
 
   describe 'listeners[0].callback (pr)', ->
     beforeEach ->
